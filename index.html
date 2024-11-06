@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #201e1e;
+        }
+        .container {
+            margin-top: 100px;
+        }
+        h1 {
+            color: #E50914;
+        }
+        #activity {
+            font-size: 3.8em;
+            width: 80%;      /* Make the text box wider */
+            height: 150px;    /* Make the text box taller */
+            padding: 10px;
+            color: #303030;
+            /* word-spacing: 0px; Sets spacing between words */
+        }
+        #timer-display {
+            font-size: 5em;
+            margin: 20px 0;
+            color: white;
+        }
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        input[type="text"] {
+            font-size: 1.2em;
+            padding: 5px;
+            width: 80px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        button {
+            font-size: 1em;
+            padding: 10px 20px;
+            background-color: #E50914;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #7e130c;
+        }
+        #stop-button {
+            display: none; /* Hidden initially */
+            margin-left: 10px;
+            background-color: #ff3333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>What is happening?</h1>
+    <textarea id="activity" rows="15" cols="130" placeholder="Type here..."></textarea>
+    
+    <h1>How much time is left?</h1>
+    <div id="timer-display">00:00:00</div>
+
+    <div class="input-container">
+        <input type="text" id="time-input" placeholder="Enter minutes">
+        <button onclick="startTimer()">Start</button>
+        <button id="stop-button" onclick="stopBeep()">Stop Beep</button>
+    </div>
+</div>
+
+<audio id="beep-sound" src="beep.mp3"></audio>
+
+<script>
+    let timer;
+    let beepInterval;
+
+    // Listen for Enter key press in the input field
+    document.getElementById("time-input").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            startTimer();
+        }
+    });
+
+    function startTimer() {
+        clearInterval(timer);
+        clearInterval(beepInterval);
+        document.getElementById("stop-button").style.display = "none"; // Hide the stop button initially
+        
+        let timeInput = document.getElementById('time-input').value;
+        let timeLeft = parseInt(timeInput) * 60; // Convert minutes to seconds
+        
+        if (isNaN(timeLeft) || timeLeft <= 0) {
+            alert("Please enter a valid number of minutes.");
+            return;
+        }
+        
+        timer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                document.getElementById('timer-display').textContent = "00:00:00";
+                startBeep();
+                return;
+            }
+            
+            timeLeft -= 1;
+            
+            let hours = Math.floor(timeLeft / 3600);
+            let minutes = Math.floor((timeLeft % 3600) / 60);
+            let seconds = timeLeft % 60;
+            
+            document.getElementById('timer-display').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    function startBeep() {
+        const beepSound = document.getElementById("beep-sound");
+        document.getElementById("stop-button").style.display = "inline-block"; // Show the stop button
+        
+        beepInterval = setInterval(() => {
+            beepSound.currentTime = 0; // Reset to the beginning
+            beepSound.play();
+        }, 1000); // Play every second
+    }
+
+    function stopBeep() {
+        clearInterval(beepInterval);
+        document.getElementById("stop-button").style.display = "none"; // Hide the stop button
+    }
+</script>
+
+</body>
+</html>
